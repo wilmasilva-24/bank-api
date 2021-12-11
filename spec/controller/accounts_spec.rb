@@ -98,4 +98,31 @@ RSpec.describe AccountsController, type: :request do
       end
     end
   end
+  describe "#show" do
+    context "Solicitar saldo" do
+      it "deve retornar status 200" do
+        customer = Customer.create!(name:"wilma", cpf:"47823", access_token:"lilla")
+        account = Account.create!(number:"18934", agency:"F7895", balance: 385.58, customer_id: customer.id)
+
+        get "/accounts/#{account.id}", headers: {"ACCESS_TOKEN" => customer.access_token}
+
+        expect(response).to have_http_status(200)
+        expect(JSON.parse(response.body)["balance"]).to eq("385.58")
+        expect(Account.last.balance.to_f).to eq(385.58)
+      end
+    end
+    context "quando informar uma conta que não existe" do
+      it "deve retornar status 422" do
+        customer = Customer.create!(name:"wilma", cpf:"47823", access_token:"lilla")
+        invalid_account = "invalid"
+        
+
+        get "/accounts/#{invalid_account}", headers: {"ACCESS_TOKEN" => customer.access_token}
+
+        expect(response).to have_http_status(422)
+        expect(JSON.parse(response.body)["erro_message"]).to eq("\"Couldn't find Account with 'id'=invalid\"")
+
+      end
+    end
+  end
 end
