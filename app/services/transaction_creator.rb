@@ -6,14 +6,12 @@ class TransactionCreator
 
   def call
     if @transaction.transaction_type == "deposit"
-      conta = Account.find(@transaction.destination_account_id)
-        if @transaction.save
-          conta.update(balance: conta.balance.to_f + @transaction.total_value.to_f)
-        end
-    
+      deposit = DepositCreator.new(@transaction).call
+
     elsif @transaction.transaction_type == "withdraw"
       conta = Account.find(@transaction.origin_account_id)
       if conta.balance.to_f < @transaction.total_value.to_f
+        return @transaction
 
       elsif @transaction.save
         conta.update(balance: conta.balance.to_f - @transaction.total_value.to_f)
@@ -24,7 +22,8 @@ class TransactionCreator
         origin = Account.find(@transaction.origin_account_id)
         destination = Account.find(@transaction.destination_account_id)
         if origin.balance.to_f < @transaction.total_value.to_f
-          return false
+          return @transaction
+
         elsif @transaction.save
           origin.update(balance: origin.balance.to_f - @transaction.total_value.to_f)
           destination.update(balance: destination.balance.to_f + @transaction.total_value.to_f)

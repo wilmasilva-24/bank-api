@@ -9,11 +9,11 @@ class TransactionsController < ApplicationController
 
       # if @transaction.save
     #     conta.update(balance: conta.balance.to_f + transaction_params[:total_value].to_f)
-        if @transaction.valid?
+        if !@transaction.id.nil?
           render json: @transaction, status: :created
       
         elsif
-          render json: @transaction.errors, status: 422
+          render json:{}, status: 422
         end
 
     # elsif transaction.transaction_type == "withdraw"
