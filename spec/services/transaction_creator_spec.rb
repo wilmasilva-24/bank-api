@@ -98,9 +98,31 @@ RSpec.describe TransactionCreator, type: :services do
         }
         
         transaction = TransactionCreator.new(transfers_invalid).call
-
+        
         expect(Account.last.balance.to_f).to eq(50.0)
       
+      end
+    end
+    context "Quando passar uma tranação inexistente" do
+      it "Tipo de transação inválida" do
+        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
+        account1 = Account.create!(number:"9841", agency:"K7789", balance: 100.00, customer_id: customer1.id)
+        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
+        account2 = Account.create!(number:"1936", agency:"K7739", balance:50.00, customer_id: customer2.id)
+
+        type_transfers = {
+          description: "Dados invalidos",
+          total_value: 150.00,
+          transaction_type: nil,
+          origin_account_id: account1.id,
+          destination_account_id: account2.id
+          
+        }
+
+        transaction = TransactionCreator.new(type_transfers).call
+
+        expect(transaction.errors.messages[:type_invalid][0]).to eq("Tipo de transação inválida.")
+
       end
     end
   end

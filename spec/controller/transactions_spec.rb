@@ -35,7 +35,7 @@ RSpec.describe TransactionsController, type: :request do
         }
 
         post "/transactions", params: invalid_params, headers: {"ACCESS_TOKEN" => customer.access_token}
-
+        
         expect(response).to have_http_status(422)
         expect(JSON.parse(response.body)["total_value"][0]).to eq("can't be blank")
       end
@@ -60,7 +60,7 @@ RSpec.describe TransactionsController, type: :request do
       end
     end
     context "Quando não tiver saldo para saque" do
-      xit "deve retornar mensagem de erro " do
+      it "deve retornar mensagem de erro " do
         customer = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
         account = Account.create!(number:"9841",agency:"K7789", balance: 300.00, customer_id: customer.id)
         invalid_params = { transaction:{
@@ -73,7 +73,7 @@ RSpec.describe TransactionsController, type: :request do
 
         post "/transactions", params: invalid_params, headers: {"ACCESS_TOKEN" => customer.access_token}
         
-        expect(JSON.parse(response.body)["message"]).to eq("Saldo insuficiente")
+        expect(JSON.parse(response.body)["insuficient_balance"][0]).to eq("Saldo insuficiente.")
       end
     end
     context "Quando realizar transferência entre contas" do
@@ -117,8 +117,9 @@ RSpec.describe TransactionsController, type: :request do
         }
         
         post "/transactions", params: transfers_invalid, headers: {"ACCESS_TOKEN" => customer2.access_token}
+        
         expect(response).to have_http_status(422)
-        #expect(JSON.parse(response.body)["erro_message"]).to eq("Não possui saldo suficiente")
+        expect(JSON.parse(response.body)["insuficient_balance"][0]).to eq ("Saldo insuficiente.")
 
       end
     end

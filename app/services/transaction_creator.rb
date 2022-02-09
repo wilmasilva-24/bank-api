@@ -9,25 +9,14 @@ class TransactionCreator
       deposit = DepositCreator.new(@transaction).call
 
     elsif @transaction.transaction_type == "withdraw"
-      conta = Account.find(@transaction.origin_account_id)
-      if conta.balance.to_f < @transaction.total_value.to_f
-        return @transaction
-
-      elsif @transaction.save
-        conta.update(balance: conta.balance.to_f - @transaction.total_value.to_f)
-
-      end
+      withdraw = WithdrawCreator.new(@transaction).call
 
     elsif @transaction.transaction_type == "transfers"
-        origin = Account.find(@transaction.origin_account_id)
-        destination = Account.find(@transaction.destination_account_id)
-        if origin.balance.to_f < @transaction.total_value.to_f
-          return @transaction
+      transfers = TransfersCreator.new(@transaction).call
 
-        elsif @transaction.save
-          origin.update(balance: origin.balance.to_f - @transaction.total_value.to_f)
-          destination.update(balance: destination.balance.to_f + @transaction.total_value.to_f)
-        end
+    else
+      @transaction.errors.add(:type_invalid, "Tipo de transação inválida.")
+
     end
 
     @transaction
