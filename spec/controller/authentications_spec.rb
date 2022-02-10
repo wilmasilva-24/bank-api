@@ -10,10 +10,10 @@ RSpec.describe AuthenticationsController, type: :request do
   describe '#sign_in' do
     context 'quando informar os dados' do
       it 'deve retornar status 200' do
-        customer = Customer.create!(name:"wilma", cpf:"86572")
-        account = Account.create!(number:"03756", agency:"l00124", customer_id: customer.id)
-        authentication_params = { "customer": {
-          "cpf": "86572",
+        customer = create(:customer, cpf:"86572")
+        account = create(:account, customer_id: customer.id)
+        authentication_params = { "customer": { 
+          "cpf": customer.cpf,
           account_id: account.id
           }
         }
@@ -26,10 +26,10 @@ RSpec.describe AuthenticationsController, type: :request do
     end
     context 'quando informar dados invalidos' do
       it 'deve retornar status 422' do
-        customer = Customer.create!(name:"Liam",cpf:"422719")
-        account = Account.create!(number:"77450", agency:"s98325", customer_id: customer.id)
+        customer = create(:customer, name:"Liam")
+        account = create(:account, customer_id: customer.id)
         invalid_params = { "customer": {
-          "name": "Liam",
+          "name": customer.name,
           account_id: account.id
           }
         }
@@ -45,7 +45,7 @@ RSpec.describe AuthenticationsController, type: :request do
   describe '#sign_out' do
     context 'para deslogar' do
       it 'deve retornar status 204' do
-        customer = Customer.create!(name:"Liam", cpf:"78235", access_token:"123")
+        customer = create(:customer)
 
         delete '/authentications/sign_out', headers: {'ACCESS_TOKEN' => customer.access_token}
 
@@ -55,7 +55,7 @@ RSpec.describe AuthenticationsController, type: :request do
     
     context 'tentando acessar o endpoint sem o usuário logado' do
       it 'deve retornar status 401' do
-        customer = Customer.create!(name:"Sky", cpf:"7522", access_token:nil)
+        customer = create(:customer, access_token:nil)
 
         delete '/authentications/sign_out', headers: {'ACCESS_TOKEN' => customer.access_token}
 

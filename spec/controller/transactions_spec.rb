@@ -5,8 +5,8 @@ RSpec.describe TransactionsController, type: :request do
   describe "create" do
     context "Realizar depósitos" do
       it "deve retornar status 201" do
-        customer = Customer.create!(name:"Liam", cpf:"896452", access_token:"asdf")
-        account = Account.create!(number:"8656", agency:"R4763", customer_id: customer.id)
+        customer = create(:customer)
+        account = create(:account, customer: customer)
         transaction_params = { transaction: {
           description: "Primeiro deposito",
           total_value: 200.00,
@@ -24,8 +24,8 @@ RSpec.describe TransactionsController, type: :request do
     end
     context "transação com dados invalidos" do
       it "deve retornar status 422" do
-        customer = Customer.create!(name:"sky", cpf: rand(100..200) , access_token:"plç21")
-        account = Account.create!(number: rand(100..200), agency:"g4785", customer_id: customer.id)
+        customer = create(:customer)
+        account = create(:account, customer: customer)
         invalid_params = { transaction: {
           description: "Dados incorretos",
           total_value: nil,
@@ -42,8 +42,8 @@ RSpec.describe TransactionsController, type: :request do
     end
     context "quando realizar o saque" do
       it "retorna os dados atualizados" do
-        customer = Customer.create!(name:"Liam", cpf:"1234", access_token:"589")
-        account = Account.create!(number:"8593", agency:"2538", balance: 500.00, customer_id: customer.id)
+        customer = create(:customer)
+        account = create(:account, balance: 500.00, customer: customer)
         withdraw_params = { transaction: {
           description: "Saque efetuado",
           total_value: 100.00,
@@ -61,8 +61,8 @@ RSpec.describe TransactionsController, type: :request do
     end
     context "Quando não tiver saldo para saque" do
       it "deve retornar mensagem de erro " do
-        customer = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account = Account.create!(number:"9841",agency:"K7789", balance: 300.00, customer_id: customer.id)
+        customer = create(:customer)
+        account = create(:account, balance: 300.00, customer: customer)
         invalid_params = { transaction:{
           description: "Novo saque",
           total_value: 700.00,
@@ -78,10 +78,10 @@ RSpec.describe TransactionsController, type: :request do
     end
     context "Quando realizar transferência entre contas" do
       it "retornar status 201" do
-        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account1 = Account.create!(number:"9841", agency:"K7789", balance: 880.00, customer_id: customer1.id)
-        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
-        account2 = Account.create!(number:"1936", agency:"K7739", balance:200.00, customer_id: customer2.id)
+        customer1 = create(:customer)
+        account1 = create(:account, balance: 880.00, customer: customer1)
+        customer2 = create(:customer)
+        account2 = create(:account, balance:200.00, customer: customer2)
 
         transfers_params = { transaction: {
           description: "Tranferencia realizada!",
@@ -102,10 +102,10 @@ RSpec.describe TransactionsController, type: :request do
     end
     context "dados invalidos na transferência" do
       it "retornar status 422" do
-        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account1 = Account.create!(number:"9841", agency:"K7789", balance: 100.00, customer_id: customer1.id)
-        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
-        account2 = Account.create!(number:"1936", agency:"K7739", balance:50.00, customer_id: customer2.id)
+        customer1 = create(:customer)
+        account1 = create(:account, balance: 100.00, customer: customer1)
+        customer2 = create(:customer)
+        account2 = create(:account, balance:50.00, customer: customer2)
 
         transfers_invalid = { transaction: {
           description: "Dados invalidos",

@@ -4,8 +4,8 @@ RSpec.describe TransactionCreator, type: :services do
   describe "#call" do
     context "quando transaction_type for igual a deposito" do
       it "precisa adicionar dinheiro na conta de destino" do
-        customer = Customer.create!(name:"Liam", cpf:"896452", access_token:"asdf")
-        account = Account.create!(number:"8656", agency:"R4763", customer_id: customer.id, balance: 100.00)
+        customer = create(:customer)
+        account = create(:account, customer: customer, balance: 100.00)
         transaction_params = {
           description: "Primeiro deposito",
           total_value: 200.00,
@@ -22,8 +22,8 @@ RSpec.describe TransactionCreator, type: :services do
 
     context "quando tiver saldo para saque" do
       it "deve retirar dinheiro na conta" do
-        customer = Customer.create!(name:"Liam", cpf:"1234", access_token:"589")
-        account = Account.create!(number:"8593", agency:"2538", balance: 500.00, customer_id: customer.id)
+        customer = create(:customer)
+        account = create(:account, balance: 500.00, customer: customer)
         withdraw_params = { 
           description: "Saque efetuado",
           total_value: 100.00,
@@ -42,8 +42,8 @@ RSpec.describe TransactionCreator, type: :services do
 
     context "Quando não tiver saldo para saque" do
       it "saldo da conta deve permanencer igual" do
-        customer = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account = Account.create!(number:"9841",agency:"K7789", balance: 300.00, customer_id: customer.id)
+        customer = create(:customer)
+        account = create(:account, balance: 300.00, customer: customer)
         invalid_params = { 
           description: "Novo saque",
           total_value: 700.00,
@@ -60,10 +60,10 @@ RSpec.describe TransactionCreator, type: :services do
     end
     context "Quando realizar transferência entre contas" do
       it "Transferencia efetuada" do
-        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account1 = Account.create!(number:"9841", agency:"K7789", balance: 880.00, customer_id: customer1.id)
-        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
-        account2 = Account.create!(number:"1936", agency:"K7739", balance:200.00, customer_id: customer2.id)
+        customer1 = create(:customer)
+        account1 = create(:account, balance: 880.00, customer: customer1)
+        customer2 = create(:customer)
+        account2 = create(:account, balance:200.00, customer: customer2)
 
         transfers_params = {
           description: "Tranferencia realizada!",
@@ -83,10 +83,10 @@ RSpec.describe TransactionCreator, type: :services do
     end
     context "dados invalidos na transferência" do
       it "retornar status 422" do
-        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account1 = Account.create!(number:"9841", agency:"K7789", balance: 100.00, customer_id: customer1.id)
-        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
-        account2 = Account.create!(number:"1936", agency:"K7739", balance:50.00, customer_id: customer2.id)
+        customer1 = create(:customer)
+        account1 = create(:account, balance: 100.00, customer: customer1)
+        customer2 = create(:customer)
+        account2 = create(:account, balance:50.00, customer: customer2)
 
         transfers_invalid = {
           description: "Dados invalidos",
@@ -105,10 +105,10 @@ RSpec.describe TransactionCreator, type: :services do
     end
     context "Quando passar uma tranação inexistente" do
       it "Tipo de transação inválida" do
-        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account1 = Account.create!(number:"9841", agency:"K7789", balance: 100.00, customer_id: customer1.id)
-        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
-        account2 = Account.create!(number:"1936", agency:"K7739", balance:50.00, customer_id: customer2.id)
+        customer1 = create(:customer)
+        account1 = create(:account, balance: 100.00, customer: customer1)
+        customer2 = create(:customer)
+        account2 = create(:account, balance:50.00, customer: customer2)
 
         type_transfers = {
           description: "Dados invalidos",

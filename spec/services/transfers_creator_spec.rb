@@ -4,10 +4,10 @@ RSpec.describe TransfersCreator, type: :services do
   describe "call" do
     context "Quando realizar transferência entre contas" do
       it "Transferencia efetuada" do
-        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account1 = Account.create!(number:"9841", agency:"K7789", balance: 880.00, customer_id: customer1.id)
-        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
-        account2 = Account.create!(number:"1936", agency:"K7739", balance:200.00, customer_id: customer2.id)
+        customer1 = create(:customer)
+        account1 = create(:account, balance: 880.00, customer: customer1)
+        customer2 = create(:customer)
+        account2 = create(:account, balance:200.00, customer: customer2)
         
         transfers_params = Transaction.new(
           description: "Tranferencia realizada!",
@@ -25,10 +25,10 @@ RSpec.describe TransfersCreator, type: :services do
     end
     context "dados invalidos na transferência" do
       it "retornar status 422" do
-        customer1 = Customer.create!(name:"Wilma", cpf:"57623", access_token:"lila")
-        account1 = Account.create!(number:"9841", agency:"K7789", balance: 100.00, customer_id: customer1.id)
-        customer2 = Customer.create!(name:"sky", cpf:"00531", access_token:"jklm")
-        account2 = Account.create!(number:"1936", agency:"K7739", balance:50.00, customer_id: customer2.id)
+        customer1 = create(:customer)
+        account1 = create(:account, balance: 100.00, customer: customer1)
+        customer2 = create(:customer)
+        account2 = create(:account, balance:50.00, customer: customer2)
 
         transfers_invalid = Transaction.new(
           description: "Dados invalidos",
