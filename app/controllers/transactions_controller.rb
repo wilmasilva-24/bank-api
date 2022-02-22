@@ -11,6 +11,19 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def index
+    origins = Transaction.only_origin_accounts(current_user)
+
+    destinations = Transaction.only_destination_accounts(current_user)
+
+    ids = origins.pluck(:id) + destinations.pluck(:id)
+    
+    transactions = Transaction.filter_by_date_interval(params[:start_date], params[:end_date]).where(id: [ids])
+
+    render json: transactions, status: :ok
+
+  end
+  
   private
 
   def transaction_params

@@ -123,5 +123,27 @@ RSpec.describe TransactionsController, type: :request do
 
       end
     end
+    context "Extrato com filtro de data de inicio e final" do
+      it "retornar status 200" do
+        customer = create(:customer)
+        account = create(:account, balance: 500.00, customer: customer)
+
+        customer2 = create(:customer)
+        account2 = create(:account, balance: 50.00, customer: customer2)
+
+        deposit = create(:transaction, total_value: 200.00, transaction_type: "deposit",destination_account_id: account.id, created_at:"2022-10-01")
+        withdraw = create(:transaction, total_value: 500.00, transaction_type: "withdraw",destination_account_id: account.id, created_at:"2022-10-27")
+        transfers = create(:transaction, total_value: 100.00, transaction_type: "transfers", origin_account_id: account.id, destination_account_id: account2.id, created_at:"2022-11-01")
+        withdraw = create(:transaction, total_value: 50.00, transaction_type: "withdraw",destination_account_id: account2.id, created_at:"2022-11-10")
+
+        get "/transactions/", params: {start_date: "2022-09-01", end_date: "2022-11-02"}, headers: {"ACCESS_TOKEN" => customer.access_token}
+        
+        expect(response).to have_http_status(200)
+        expect(JSON.parse(response.body)[0]["total_value"]).to eq ("200.0")
+        expect(JSON.parse(response.body).count).to eq(3)
+            
+
+      end
+    end
   end
 end

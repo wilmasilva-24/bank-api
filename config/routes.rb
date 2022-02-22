@@ -5,5 +5,5 @@ Rails.application.routes.draw do
     post 'sign_in', on: :collection
     delete 'sign_out', on: :collection
   end
-  resources :transactions, only: [:create]
+  resources :transactions, only: [:create, :index]
 end
